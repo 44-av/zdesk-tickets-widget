@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Zoho Desk - Apps</title>
+	<link rel="stylesheet" href="/app/css/index.css">
+</head>
+
+<body>
+
+	<div class="ticket-card">
+  <h3 class="card-title">Parent Ticket</h3>
+  <div class="separator"></div>
+
+  <div class="ticket-row">
+    <div class="col left">
+      <p class="visit">Client Visit</p>
+      <p class="id-name"><span>#GEN-518</span> · Ariane Villalino</p>
+      <p class="meta">Created On: 19 Jan 9:32 AM</p>
+    </div>
+
+    <div class="col middle">
+      <p class="meta">Due: 29 Jan 9:32 AM</p>
+      <p class="status open">Status: Open</p>
+    </div>
+
+    <div class="col right">
+      <p class="meta">Department: Warehouse</p>
+      <p class="meta">Owner: Agent 1</p>
+    </div>
+  </div>
+</div>
+
+
+<div class="ticket-card">
+  <h3 class="card-title">Peer Child Ticket</h3>
+  <div class="separator"></div>
+
+  <div class="ticket-row">
+    <div class="col left">
+      <p class="visit">Client Visit</p>
+      <p class="id-name"><span>#WH-520</span> · Ariane Villalino</p>
+      <p class="meta">Created On: 02 Nov 4:00 PM</p>
+    </div>
+
+    <div class="col middle">
+      <p class="meta">Due: 03 Nov 4:00 PM</p>
+      <p class="status closed">Status: Closed</p>
+    </div>
+
+    <div class="col right">
+      <p class="meta">Department: Warehouse</p>
+      <p class="meta">Owner: Agent 2</p>
+    </div>
+  </div>
+
+  <div class="row-divider"></div>
+
+  <div class="ticket-row">
+    <div class="col left">
+      <p class="visit">Client Visit</p>
+      <p class="id-name"><span>#IT-525</span> · Ariane Villalino</p>
+      <p class="meta">Created On: 04 Nov 4:00 PM</p>
+    </div>
+
+    <div class="col middle">
+      <p class="meta">Due: 04 Nov 4:00 PM</p>
+      <p class="status late">Late by 1 day(s) 2 hours</p>
+      <p class="status open">Status: Open</p>
+    </div>
+
+    <div class="col right">
+      <p class="meta">Department: IT</p>
+      <p class="meta">Owner: Agent 3</p>
+    </div>
+  </div>
+</div>
+
+
+	<script src="https://js.zohostatic.com/support/developer_sdk/v1/js/ZohoDeskClientSDK.min.js"></script>
+	<script>
+	window.onload = function () {
+	 ZOHODESK.extension.onload().then(function (App) {
+
+		//Get ticket related data
+		ZOHODESK.get('ticket.email').then(function (res) {
+				//response Handling
+			}).catch(function (err) {
+				//error Handling
+			});
+		/*	
+					//To Set data in Desk UI Client
+					ZOHODESK.set('ticket.comment', { 'content': "Test comment" }).then(function (res) {
+						//response Handling
+					}).catch(function (err) {
+						//error Handling
+					});
+		
+					//Access Data Storage for an extension
+					//Get the saved data of an extension from data storage
+					ZOHODESK.get('database', { 'key': 'key1', 'queriableValue': 'value1' }).then(function (response) {
+						//response Handling
+					}).catch(function (err) {
+						//error Handling
+					})            
+					
+					//Save data in to data staorage
+					ZOHODESK.set('database', { 'key': 'key_1', 'value': { 'id': 123 }, 'queriableValue': 'value1' }).then(function (response) {
+						//response Handling
+					}).catch(function (err) {
+						//error Handling
+					})
+		
+					//Change tabs in ticket detailview
+					ZOHODESK.invoke('ROUTE_TO', 'ticket.attachments');
+		
+					//To Insert the content in the current opened reply editor from extension
+					ZOHODESK.invoke('Insert', 'ticket.replyEditor', { content: "<p>your content</p>" });
+		
+					//To listen to an event in desk
+					App.instance.on('comment_Added', function(data){
+						//data handling 
+					});
+		
+					//To access locale
+					App.locale;
+		
+					//To access localresources
+					App.localeResource            
+						
+					//To Know more on these, please read the documentation
+				*/
+	});
+};
+</script>
+
+	<script src="./js/extension.js" charset="utf-8"></script>
+
+</body>
+
+</html>

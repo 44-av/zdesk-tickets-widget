@@ -1,0 +1,68 @@
+.ticket-card {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  font-family: Arial, sans-serif;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.separator {
+  height: 1px;
+  background: #e6e6e6;
+  margin-bottom: 10px;
+}
+
+.ticket-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.col p {
+  margin: 2px 0;
+  font-size: 12px;
+  color: #444;
+}
+
+.visit {
+  font-weight: 600;
+  color: #222;
+}
+
+.id-name span {
+  font-weight: 600;
+}
+
+.meta {
+  color: #666;
+}
+
+.status {
+  font-weight: 600;
+}
+
+.status.open {
+  color: #2e7d32;
+}
+
+.status.closed {
+  color: #777;
+}
+
+.status.late {
+  color: #d32f2f;
+}
+
+.row-divider {
+  height: 1px;
+  background: #e6e6e6;
+  margin: 8px 0;
+}
