@@ -1,95 +1,86 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Zoho Desk - Apps</title>
+    <link rel="stylesheet" href="/app/css/index.css" />
+  </head>
 
-<head>
-	<meta charset="UTF-8">
-	<title>Zoho Desk - Apps</title>
-	<link rel="stylesheet" href="/app/css/index.css">
-</head>
+  <body>
+    <!---Parent Ticket-->
+    <div class="ticket-card" id="parentCard">
+      <h3 class="card-title">Parent Ticket</h3>
+      <div class="separator"></div>
 
-<body>
+      <div class="ticket-row">
+        <div class="col left">
+          <p class="visit">Client Visit</p>
 
-	<div class="ticket-card">
-  <h3 class="card-title">Parent Ticket</h3>
-  <div class="separator"></div>
+          <p class="id-name">
+            <span data-p="ticketNumber">#GEN-518</span> ·
+            <span data-p="name">Ariane Villalino</span>
+          </p>
 
-  <div class="ticket-row">
-    <div class="col left">
-      <p class="visit">Client Visit</p>
-      <p class="id-name"><span>#GEN-518</span> · Ariane Villalino</p>
-      <p class="meta">Created On: 19 Jan 9:32 AM</p>
+          <p class="meta" data-p="created">Created On: 19 Jan 9:32 AM</p>
+        </div>
+
+        <div class="col middle">
+          <p class="meta" data-p="due">Due: 29 Jan 9:32 AM</p>
+          <p class="status open" data-p="status">Status: Open</p>
+        </div>
+
+        <div class="col right">
+          <p class="meta" data-p="department">Department: Warehouse</p>
+          <p class="meta" data-p="owner">Owner: Agent 1</p>
+        </div>
+      </div>
     </div>
 
-    <div class="col middle">
-      <p class="meta">Due: 29 Jan 9:32 AM</p>
-      <p class="status open">Status: Open</p>
-    </div>
-
-    <div class="col right">
-      <p class="meta">Department: Warehouse</p>
-      <p class="meta">Owner: Agent 1</p>
-    </div>
-  </div>
-</div>
-
-
-<div class="ticket-card">
+    <!---Peer Children Ticket-->
+    <div class="ticket-card" id="peerChildContainer">
   <h3 class="card-title">Peer Child Ticket</h3>
   <div class="separator"></div>
 
-  <div class="ticket-row">
+  <!-- TEMPLATE (hidden, used for cloning) -->
+   <!--style="display:none"-->
+  <div class="ticket-row child-template">
     <div class="col left">
       <p class="visit">Client Visit</p>
-      <p class="id-name"><span>#WH-520</span> · Ariane Villalino</p>
-      <p class="meta">Created On: 02 Nov 4:00 PM</p>
+
+      <p class="id-name">
+        <span data-c="ticketNumber">#</span> ·
+        <span data-c="name">Name</span>
+      </p>
+
+      <p class="meta" data-c="created">Created On:</p>
     </div>
 
     <div class="col middle">
-      <p class="meta">Due: 03 Nov 4:00 PM</p>
-      <p class="status closed">Status: Closed</p>
+      <p class="meta" data-c="due">Due:</p>
+      <p class="status open" data-c="status">Status:</p>
     </div>
 
     <div class="col right">
-      <p class="meta">Department: Warehouse</p>
-      <p class="meta">Owner: Agent 2</p>
-    </div>
-  </div>
-
-  <div class="row-divider"></div>
-
-  <div class="ticket-row">
-    <div class="col left">
-      <p class="visit">Client Visit</p>
-      <p class="id-name"><span>#IT-525</span> · Ariane Villalino</p>
-      <p class="meta">Created On: 04 Nov 4:00 PM</p>
-    </div>
-
-    <div class="col middle">
-      <p class="meta">Due: 04 Nov 4:00 PM</p>
-      <p class="status late">Late by 1 day(s) 2 hours</p>
-      <p class="status open">Status: Open</p>
-    </div>
-
-    <div class="col right">
-      <p class="meta">Department: IT</p>
-      <p class="meta">Owner: Agent 3</p>
+      <p class="meta" data-c="department">Department:</p>
+      <p class="meta" data-c="owner">Owner:</p>
     </div>
   </div>
 </div>
 
 
-	<script src="https://js.zohostatic.com/support/developer_sdk/v1/js/ZohoDeskClientSDK.min.js"></script>
-	<script>
-	window.onload = function () {
-	 ZOHODESK.extension.onload().then(function (App) {
-
-		//Get ticket related data
-		ZOHODESK.get('ticket.email').then(function (res) {
-				//response Handling
-			}).catch(function (err) {
-				//error Handling
-			});
-		/*	
+    <script src="https://js.zohostatic.com/support/developer_sdk/v1/js/ZohoDeskClientSDK.min.js"></script>
+    <script>
+      window.onload = function () {
+        ZOHODESK.extension.onload().then(function (App) {
+          //Get ticket related data
+          ZOHODESK.get("ticket.email")
+            .then(function (res) {
+              //response Handling
+            })
+            .catch(function (err) {
+              //error Handling
+            });
+          /*	
 					//To Set data in Desk UI Client
 					ZOHODESK.set('ticket.comment', { 'content': "Test comment" }).then(function (res) {
 						//response Handling
@@ -131,12 +122,10 @@
 						
 					//To Know more on these, please read the documentation
 				*/
-	});
-};
-</script>
+        });
+      };
+    </script>
 
-	<script src="./js/extension.js" charset="utf-8"></script>
-
-</body>
-
+    <script src="./js/extension.js" charset="utf-8"></script>
+  </body>
 </html>

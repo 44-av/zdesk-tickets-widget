@@ -6,14 +6,18 @@
   "storage": false,
   "type": "personal",
   "whiteListedDomains": [],
+  "endpoint": "https://localhost:5000",
   "modules": {
     "widgets": [
       {
-        "location": "desk.ticket.detail.rightpanel",
-        "url": "/app/widget.html",
-        "name": "Desk Extension",
+        "name": "Parent and Child Custom View",
+        "title": "Parent and Child Custom View",
+        "icon": "/app/img/icon.png",
         "logo": "/app/img/logo.png",
-        "icon": "/app/img/icon.png"
+        "location": "desk.ticket.detail.subtab",
+        "host": "localhost:5000",
+        "url": "/app/widget.html",
+         "ssl": true
       }
     ]
   },
