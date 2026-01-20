@@ -35,6 +35,7 @@
 .visit {
   font-weight: 600;
   color: #222;
+  font-size: 12px;
 }
 
 .id-name span {
@@ -43,6 +44,7 @@
 
 .meta {
   color: #666;
+  font-weight: bold;
 }
 
 .status {
@@ -66,3 +68,14 @@
   background: #e6e6e6;
   margin: 8px 0;
 }
+.ticketData{
+  font-weight: normal;
+}
+.status-badge {
+    display: inline-block;
+    color: white; /* text color */
+    font-weight: bold;
+    font-size: 0.9em;
+    text-align: center;
+  }
+

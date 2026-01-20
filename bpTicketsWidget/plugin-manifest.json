@@ -5,7 +5,13 @@
   "service": "DESK",
   "storage": false,
   "type": "personal",
-  "whiteListedDomains": [],
+  "whiteListedDomains": ["https://desk.zoho.com"],
+  "connection": {
+    "zohodesk": {
+    "type": "oauth",
+    "scope": "Desk.tickets.READ"
+    }
+  },
   "endpoint": "https://localhost:5000",
   "modules": {
     "widgets": [

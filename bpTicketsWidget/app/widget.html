@@ -21,111 +21,165 @@
             <span data-p="name">Ariane Villalino</span>
           </p>
 
-          <p class="meta" data-p="created">Created On: 19 Jan 9:32 AM</p>
+          <p class="meta" data-p="created">
+            Created On: <span class="ticketData">19 Jan 9:32 AM</span>
+          </p>
         </div>
 
         <div class="col middle">
-          <p class="meta" data-p="due">Due: 29 Jan 9:32 AM</p>
-          <p class="status open" data-p="status">Status: Open</p>
+          <p class="meta" data-p="due">
+            Due:<span class="ticketData">29 Jan 9:32 AM</span>
+          </p>
+          <p class="status" data-p="status">
+            Status: <span class="ticketData">Open</span>
+          </p>
         </div>
 
         <div class="col right">
-          <p class="meta" data-p="department">Department: Warehouse</p>
-          <p class="meta" data-p="owner">Owner: Agent 1</p>
+          <p class="meta" data-p="department">
+            Department: <span class="ticketData">GTE</span>
+          </p>
+          <p class="meta" data-p="owner">
+            Owner: <span class="ticketData">GTE</span>
+          </p>
         </div>
       </div>
     </div>
 
     <!---Peer Children Ticket-->
     <div class="ticket-card" id="peerChildContainer">
-  <h3 class="card-title">Peer Child Ticket</h3>
-  <div class="separator"></div>
+      <h3 class="card-title">Peer Child Ticket</h3>
+      <div class="separator"></div>
 
-  <!-- TEMPLATE (hidden, used for cloning) -->
-   <!--style="display:none"-->
-  <div class="ticket-row child-template">
-    <div class="col left">
-      <p class="visit">Client Visit</p>
+      <!-- TEMPLATE (hidden, used for cloning) -->
+      <!--style="display:none"-->
+      <div class="ticket-row child-template">
+        <div class="col left">
+          <p class="visit">Client Visit</p>
 
-      <p class="id-name">
-        <span data-c="ticketNumber">#</span> ·
-        <span data-c="name">Name</span>
-      </p>
+          <p class="id-name">
+            <span data-c="ticketNumber">#</span> ·
+            <span data-c="name">Name</span>
+          </p>
 
-      <p class="meta" data-c="created">Created On:</p>
+          <p class="meta" data-c="created">Created On:</p>
+        </div>
+
+        <div class="col middle">
+          <p class="meta" data-c="due">Due:</p>
+          <p class="status" data-p="status">
+            Status: <span class="status-color"></span>
+          </p>
+        </div>
+
+        <div class="col right">
+          <p class="meta" data-c="department">Department:</p>
+          <p class="meta" data-c="owner">Owner:</p>
+        </div>
+      </div>
     </div>
-
-    <div class="col middle">
-      <p class="meta" data-c="due">Due:</p>
-      <p class="status open" data-c="status">Status:</p>
-    </div>
-
-    <div class="col right">
-      <p class="meta" data-c="department">Department:</p>
-      <p class="meta" data-c="owner">Owner:</p>
-    </div>
-  </div>
-</div>
-
 
     <script src="https://js.zohostatic.com/support/developer_sdk/v1/js/ZohoDeskClientSDK.min.js"></script>
     <script>
       window.onload = function () {
-        ZOHODESK.extension.onload().then(function (App) {
-          //Get ticket related data
-          ZOHODESK.get("ticket.email")
+        ZOHODESK.extension.onload().then(function () {
+          ZOHODESK.get("ticket")
             .then(function (res) {
-              //response Handling
+              const ticket = res.ticket;
+              console.log(res["ticket"]);
+
+              const mapped = {
+                ticketNumber: ticket.number,
+                contact: { firstName: ticket.contactName },
+                createdTime: ticket.createdTime,
+                dueDate: ticket.dueDate,
+                status: ticket.status,
+                department: {
+                  name: ticket.departmentName || ticket.departmentId,
+                },
+                assignee: { name: ticket.owner },
+              };
+
+              renderParent(mapped);
             })
             .catch(function (err) {
-              //error Handling
+              console.log("ERROR TICKET READ", err);
             });
-          /*	
-					//To Set data in Desk UI Client
-					ZOHODESK.set('ticket.comment', { 'content': "Test comment" }).then(function (res) {
-						//response Handling
-					}).catch(function (err) {
-						//error Handling
-					});
-		
-					//Access Data Storage for an extension
-					//Get the saved data of an extension from data storage
-					ZOHODESK.get('database', { 'key': 'key1', 'queriableValue': 'value1' }).then(function (response) {
-						//response Handling
-					}).catch(function (err) {
-						//error Handling
-					})            
-					
-					//Save data in to data staorage
-					ZOHODESK.set('database', { 'key': 'key_1', 'value': { 'id': 123 }, 'queriableValue': 'value1' }).then(function (response) {
-						//response Handling
-					}).catch(function (err) {
-						//error Handling
-					})
-		
-					//Change tabs in ticket detailview
-					ZOHODESK.invoke('ROUTE_TO', 'ticket.attachments');
-		
-					//To Insert the content in the current opened reply editor from extension
-					ZOHODESK.invoke('Insert', 'ticket.replyEditor', { content: "<p>your content</p>" });
-		
-					//To listen to an event in desk
-					App.instance.on('comment_Added', function(data){
-						//data handling 
-					});
-		
-					//To access locale
-					App.locale;
-		
-					//To access localresources
-					App.localeResource            
-						
-					//To Know more on these, please read the documentation
-				*/
         });
       };
-    </script>
 
-    <script src="./js/extension.js" charset="utf-8"></script>
+      const statusColors = {
+        "Closed": "#e74c3c",       // red
+        "In Progress": "#3498db",  // blue
+        "Open": "#2ecc71",         // green
+        "On Hold": "#e67e22",      // orange
+        "Escalated": "#f1c40f"     // yellow
+      };
+
+      function getStatusColor(status) {
+        return statusColors[status] || "#7f8c8d"; // fallback gray
+      }
+
+      function formatDate(dateInput) {
+        return new Date(dateInput)
+          .toLocaleString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          })
+          .replace(",", "");
+      }
+
+      function setText(selector, text) {
+        const el = document.querySelector(selector);
+        if (el) el.textContent = text;
+      }
+
+      function renderParent(t) {
+        setText("[data-p='ticketNumber']", `#${t.ticketNumber}`);
+        setText("[data-p='name']", t.contact?.firstName || "—");
+        setText("[data-p='created'] .ticketData", formatDate(t.createdTime));
+        setText("[data-p='due'] .ticketData", formatDate(t.dueDate));
+        const statusSpan = document.querySelector("[data-p='status'] .ticketData");
+        statusSpan.textContent = t.status || "—";
+        statusSpan.className = "status-badge";       // add badge class
+        statusSpan.style.color = getStatusColor(t.status);
+        setText("[data-p='department'] .ticketData", t.department?.name || "—");
+        setText("[data-p='owner'] .ticketData", t.assignee?.name || "—");
+      }
+
+      function renderChild(t) {
+        const container = document.getElementById("peerChildContainer");
+        const template = container.querySelector(".child-template");
+
+        const clone = template.cloneNode(true);
+        clone.classList.remove("child-template");
+        clone.style.display = "flex";
+
+        clone.querySelector("[data-c='ticketNumber']").textContent =
+          `#${t.ticketNumber}`;
+        clone.querySelector("[data-c='name']").textContent =
+          t.contact?.firstName || "—";
+        clone.querySelector("[data-c='created']").textContent =
+          "Created On: " + formatDate(t.createdTime);
+        clone.querySelector("[data-c='due']").textContent =
+          "Due: " + formatDate(t.dueDate);
+        clone.querySelector("[data-c='department']").textContent =
+          "Department: " + (t.department?.name || "—");
+        clone.querySelector("[data-c='owner']").textContent =
+          "Owner: " + (t.assignee?.name || "—");
+
+          // Set status badge
+          const statusEl = clone.querySelector(".status-color");
+          statusEl.textContent = t.status || "—";
+          statusEl.className = "status-badge";           // badge style
+          statusEl.style.backgroundColor = getStatusColor(t.status);
+
+          container.appendChild(clone);
+      }
+    </script>
   </body>
 </html>
