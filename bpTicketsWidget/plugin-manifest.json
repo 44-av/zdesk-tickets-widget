@@ -5,14 +5,11 @@
   "service": "DESK",
   "storage": false,
   "type": "personal",
-  "whiteListedDomains": ["https://desk.zoho.com"],
-  "connection": {
-    "zohodesk": {
-    "type": "oauth",
-    "scope": "Desk.tickets.READ"
-    }
-  },
+  "scopes": [
+    "Desk.tickets.READ"
+  ],
   "endpoint": "https://localhost:5000",
+  "whiteListedDomains": ["https://desk.zoho.com"],
   "modules": {
     "widgets": [
       {
@@ -28,10 +25,42 @@
     ]
   },
   "cspDomains": {
-    "connect-src": []
+    "connect-src": [
+      "https://desk.zoho.com"
+    ]
   },
   "zohoAuthorisation": {},
-  "connectors": [],
+  "connectors": [
+    {
+    "connectionLinkName": "desk_api",
+    "connectionName": "desk_api_conn",
+    "serviceName": "zlabs_integration",
+    "userAccess": true,
+    "isUserDefinedService": false,
+    "sharedBy": "720446337",
+    "scope": [
+      "Desk.tickets.ALL",
+      "Desk.tickets.READ",
+      "Desk.contacts.READ",
+      "Desk.contacts.WRITE",
+      "Desk.tasks.ALL",
+      "Desk.settings.ALL",
+      "Desk.search.READ",
+      "Desk.extensions.ALL",
+      "Desk.contacts.ALL",
+      "Desk.basic.ALL",
+      "Desk.articles.ALL",
+      "Desk.calls.ALL",
+      "Desk.events.ALL",
+      "Desk.products.READ",
+      "Desk.integrations.ALL",
+      "Desk.custommodule.READ",
+      "Desk.custommodule.CREATE",
+      "Desk.custommodule.UPDATE",
+      "Desk.custommodule.ALL"
+    ]
+}
+  ],
   "config": [],
   "moduleSupport": true
 }

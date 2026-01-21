@@ -77,76 +77,99 @@
           <p class="meta" data-c="owner">Owner:</p>
         </div>
       </div>
+<p class="no-child-text" style="display:none; font-style: italic; color: #555;">
+    No Child Ticket
+  </p>
     </div>
 
     <script src="https://js.zohostatic.com/support/developer_sdk/v1/js/ZohoDeskClientSDK.min.js"></script>
     <script>
       window.onload = function () {
-        ZOHODESK.extension.onload().then(function () {
-          ZOHODESK.get("ticket")
-            .then(function (res) {
-              const ticket = res.ticket;
-              console.log(res["ticket"]);
+  ZOHODESK.extension.onload().then(() => {
+    // Fetch parent ticket
+    ZOHODESK.get("ticket")
+      .then((res) => {
+        const ticket = res.ticket;
+        const mappedParent = mapTicket(ticket);
+        renderParent(mappedParent);
 
-              const mapped = {
-                ticketNumber: ticket.number,
-                contact: { firstName: ticket.contactName },
-                createdTime: ticket.createdTime,
-                dueDate: ticket.dueDate,
-                status: ticket.status,
-                department: {
-                  name: ticket.departmentName || ticket.departmentId,
-                },
-                assignee: { name: ticket.owner },
-              };
+        // Determine child ticket (mock or real ID)
+        const childTicketId = ticket.cf?.cf_child_ticket_id;
 
-              renderParent(mapped);
-            })
-            .catch(function (err) {
-              console.log("ERROR TICKET READ", err);
-            });
-        });
-      };
+        if (childTicketId) {
+          // In local testing, use a mock child
+          const mockChildTicket = {
+            ticketNumber: "GEN-999",
+            contact: { firstName: "John Doe" },
+            createdTime: new Date(),
+            dueDate: new Date(Date.now() + 86400000),
+            status: "Open",
+            department: { name: "Support" },
+            assignee: { name: "Agent X" }
+          };
 
-      const statusColors = {
-        "Closed": "#e74c3c",       // red
-        "In Progress": "#3498db",  // blue
-        "Open": "#2ecc71",         // green
-        "On Hold": "#e67e22",      // orange
-        "Escalated": "#f1c40f"     // yellow
-      };
+          renderChild(mockChildTicket); // render the child
+        } else {
+          showNoChildText(); // show "No Child Ticket"
+        }
+      })
+      .catch((err) => {
+        console.log("Error fetching parent ticket:", err);
+        showNoChildText(); // optional: show message if parent fails
+      });
+  });
+};
+      // Fetch child ticket using Zoho connector
+      function getChildTicket(ticketId) {
+        console.log("Fetching child ticket:", ticketId);
 
-      function getStatusColor(status) {
-        return statusColors[status] || "#7f8c8d"; // fallback gray
-      }
+        const requestObj = {
+          url: `/api/v1/tickets/${ticketId}`, // relative URL for widgets
+          type: "get", // must be lowercase
+          headers: { "Content-Type": "application/json" },
+          connectionLinkName: "desk_api",
+        };
 
-      function formatDate(dateInput) {
-        return new Date(dateInput)
-          .toLocaleString("en-GB", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
+        ZOHODESK.request(requestObj)
+          .then((res) => {
+            if (!res) {
+              console.log("No data returned for child ticket");
+              return;
+            }
+            const mappedChild = mapTicket(res);
+            //renderChild(mappedChild);
+            const mockChildTicket = {
+            ticketNumber: "GEN-999",
+            contact: { firstName: "John Doe" },
+            createdTime: new Date(),
+            dueDate: new Date(Date.now() + 86400000),
+            status: "Open",
+            department: { name: "Support" },
+            assignee: { name: "Agent X" }
+          };
+
+          renderChild(mockChildTicket);
+
           })
-          .replace(",", "");
+          .catch((err) => {
+            console.log("Error fetching child ticket:", err);
+          });
       }
 
-      function setText(selector, text) {
-        const el = document.querySelector(selector);
-        if (el) el.textContent = text;
-      }
-
+      // --- Render functions ---
       function renderParent(t) {
         setText("[data-p='ticketNumber']", `#${t.ticketNumber}`);
         setText("[data-p='name']", t.contact?.firstName || "—");
         setText("[data-p='created'] .ticketData", formatDate(t.createdTime));
         setText("[data-p='due'] .ticketData", formatDate(t.dueDate));
-        const statusSpan = document.querySelector("[data-p='status'] .ticketData");
+
+        const statusSpan = document.querySelector(
+          "[data-p='status'] .ticketData",
+        );
         statusSpan.textContent = t.status || "—";
-        statusSpan.className = "status-badge";       // add badge class
+        statusSpan.className = "status-badge";
         statusSpan.style.color = getStatusColor(t.status);
+
         setText("[data-p='department'] .ticketData", t.department?.name || "—");
         setText("[data-p='owner'] .ticketData", t.assignee?.name || "—");
       }
@@ -154,6 +177,10 @@
       function renderChild(t) {
         const container = document.getElementById("peerChildContainer");
         const template = container.querySelector(".child-template");
+        const emptyText = container.querySelector(".no-child-text");
+
+        if (emptyText) emptyText.style.display = "none";
+        if (!t) return;
 
         const clone = template.cloneNode(true);
         clone.classList.remove("child-template");
@@ -172,14 +199,63 @@
         clone.querySelector("[data-c='owner']").textContent =
           "Owner: " + (t.assignee?.name || "—");
 
-          // Set status badge
-          const statusEl = clone.querySelector(".status-color");
-          statusEl.textContent = t.status || "—";
-          statusEl.className = "status-badge";           // badge style
-          statusEl.style.backgroundColor = getStatusColor(t.status);
+        const statusEl = clone.querySelector(".status-color");
+        statusEl.textContent = t.status || "—";
+        statusEl.className = "status-badge";
+        statusEl.style.backgroundColor = getStatusColor(t.status);
 
-          container.appendChild(clone);
+        container.appendChild(clone);
       }
+
+      // --- Helpers ---
+      function mapTicket(ticket) {
+        return {
+          ticketNumber: ticket.number,
+          contact: { firstName: ticket.contactName },
+          createdTime: ticket.createdTime,
+          dueDate: ticket.dueDate,
+          status: ticket.status,
+          department: { name: ticket.departmentId },
+          assignee: { name: ticket.ownerName || ticket.owner },
+        };
+      }
+
+      function showNoChildText() {
+        const container = document.getElementById("peerChildContainer");
+        const emptyText = container.querySelector(".no-child-text");
+        if (emptyText) emptyText.style.display = "block";
+      }
+
+      function setText(selector, text) {
+        const el = document.querySelector(selector);
+        if (el) el.textContent = text;
+      }
+
+      function getStatusColor(status) {
+        const colors = {
+          Closed: "#e74c3c",
+          "In Progress": "#3498db",
+          Open: "#2ecc71",
+          "On Hold": "#e67e22",
+          Escalated: "#f1c40f",
+        };
+        return colors[status] || "#7f8c8d";
+      }
+
+      function formatDate(dateInput) {
+        if (!dateInput) return "—";
+        return new Date(dateInput)
+          .toLocaleString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          })
+          .replace(",", "");
+      }
+    
     </script>
   </body>
 </html>
