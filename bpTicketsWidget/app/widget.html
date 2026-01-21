@@ -91,8 +91,18 @@
       .then((res) => {
         const ticket = res.ticket;
         const mappedParent = mapTicket(ticket);
-        renderParent(mappedParent);
-
+        const isParent = ticket.cf?.cf_is_parent_ticket;
+        console.log("IS Parent: "+isParent);
+        const parentDiv = document.getElementById("parentCard");
+        if (isParent) {
+          // hide parent div
+          parentDiv.style.display = "none";
+        } else {
+          // show and render parent ticket
+          parentDiv.style.display = "flex"; 
+          renderParent(mappedParent);
+        }
+        console.log("RAW: ",ticket);
         // Determine child ticket (mock or real ID)
         const childTicketId = ticket.cf?.cf_child_ticket_id;
 
@@ -119,6 +129,10 @@
       });
   });
 };
+
+    function getParentTicket(){
+      
+    }
       // Fetch child ticket using Zoho connector
       function getChildTicket(ticketId) {
         console.log("Fetching child ticket:", ticketId);
