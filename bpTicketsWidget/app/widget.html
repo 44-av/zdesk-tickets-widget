@@ -9,44 +9,43 @@
   <body>
     <!---Parent Ticket-->
     <div class="ticket-card" id="parentCard">
-  <h3 class="card-title">Parent Ticket</h3>
-  <div class="separator"></div>
+      <h3 class="card-title">Parent Ticket</h3>
+      <div class="separator"></div>
 
-  <!-- This row contains all the ticket info below the header -->
-  <div class="ticket-row">
-    <div class="col left">
-      <p class="visit">Client Visit</p>
+      <!-- This row contains all the ticket info below the header -->
+      <div class="ticket-row">
+        <div class="col left">
+          <p class="visit">Client Visit</p>
 
-      <p class="id-name">
-        <span data-p="ticketNumber">#GEN-518</span> ·
-        <span data-p="name">Ariane Villalino</span>
-      </p>
+          <p class="id-name">
+            <span data-p="ticketNumber">#GEN-518</span> ·
+            <span data-p="name">Ariane Villalino</span>
+          </p>
 
-      <p class="meta" data-p="created">
-        Created On: <span class="ticketData">19 Jan 9:32 AM</span>
-      </p>
+          <p class="meta" data-p="created">
+            Created On: <span class="ticketData">19 Jan 9:32 AM</span>
+          </p>
+        </div>
+
+        <div class="col middle">
+          <p class="meta" data-p="due">
+            Due:<span class="ticketData">29 Jan 9:32 AM</span>
+          </p>
+          <p class="status" data-p="status">
+            Status: <span class="ticketData">Open</span>
+          </p>
+        </div>
+
+        <div class="col right">
+          <p class="meta" data-p="department">
+            Department: <span class="ticketData">GTE</span>
+          </p>
+          <p class="meta" data-p="owner">
+            Owner: <span class="ticketData">GTE</span>
+          </p>
+        </div>
+      </div>
     </div>
-
-    <div class="col middle">
-      <p class="meta" data-p="due">
-        Due:<span class="ticketData">29 Jan 9:32 AM</span>
-      </p>
-      <p class="status" data-p="status">
-        Status: <span class="ticketData">Open</span>
-      </p>
-    </div>
-
-    <div class="col right">
-      <p class="meta" data-p="department">
-        Department: <span class="ticketData">GTE</span>
-      </p>
-      <p class="meta" data-p="owner">
-        Owner: <span class="ticketData">GTE</span>
-      </p>
-    </div>
-  </div>
-</div>
-
 
     <!---Peer Children Ticket-->
     <div class="ticket-card" id="peerChildContainer">
@@ -149,21 +148,17 @@
           renderParent(mapTicket(parent));
         });
         fetchChildren(parentId);
-
       }
 
       function fetchChildren(parentId) {
         console.log("FETCHING CHILDREN...");
 
         ZOHODESK.request({
-          url: `https://desk.zoho.com/api/v1/tickets/search`,
-         headers: { "Content-Type": "application/json" },
+          url: `https://desk.zoho.com/api/v1/tickets/search?criteria=`,
+          headers: { "Content-Type": "application/json" },
           postBody: {},
-          type: "POST",
-          data: {
-            orgId: "720446337",
-            criteria: `(cf_parent_ticket_id_1:equals:${parentId})`
-          },
+          type: "GET",
+          data: { orgId: "720446337", criteria:"" },
           connectionLinkName: "desk_api",
         })
           .then((res) => {
