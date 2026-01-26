@@ -18,30 +18,30 @@
           <p class="visit">Client Visit</p>
 
           <p class="id-name">
-            <span data-p="ticketNumber">#GEN-518</span> ·
-            <span data-p="name">Ariane Villalino</span>
+            <span data-p="ticketNumber">#</span> -
+            <span data-p="name">Name</span>
           </p>
 
           <p class="meta" data-p="created">
-            Created On: <span class="ticketData">19 Jan 9:32 AM</span>
+            Created On: <span class="ticketData">-</span>
           </p>
         </div>
 
         <div class="col middle">
           <p class="meta" data-p="due">
-            Due:<span class="ticketData">29 Jan 9:32 AM</span>
+            Due:<span class="ticketData">-</span>
           </p>
           <p class="status" data-p="status">
-            Status: <span class="ticketData">Open</span>
+            Status: <span class="ticketData">-</span>
           </p>
         </div>
 
         <div class="col right">
           <p class="meta" data-p="department">
-            Department: <span class="ticketData">GTE</span>
+            Department: <span class="ticketData">-</span>
           </p>
           <p class="meta" data-p="owner">
-            Owner: <span class="ticketData">GTE</span>
+            Owner: <span class="ticketData">-</span>
           </p>
         </div>
       </div>
@@ -53,30 +53,32 @@
       <div class="separator"></div>
 
       <!-- TEMPLATE (hidden, used for cloning) -->
-      <div class="ticket-row child-template" style="display: none">
+      <div class="ticket-row child-template hidden">
         <div class="col left">
           <p class="visit">Client Visit</p>
 
           <p class="id-name">
-            <span data-c="ticketNumber">#</span> ·
+            <span data-c="ticketNumber">#</span> -
             <span data-c="name">Name</span>
           </p>
 
-          <p class="meta" data-c="created">Created On:</p>
+         <p><strong>Created On:</strong><span data-c="created"></p>
         </div>
 
         <div class="col middle">
-          <p class="meta" data-c="due">Due:</p>
+          <p><strong>Due:&nbsp;</strong> <span data-c="due">-</p>
           <p class="status" data-p="status">
-            Status: <span class="status-color"></span>
+            Status:&nbsp;<span class="status-color"></span>
           </p>
         </div>
 
         <div class="col right">
-          <p class="meta" data-c="department">Department:</p>
-          <p class="meta" data-c="owner">Owner:</p>
+          <p><strong>Department:&nbsp;</strong><span data-c="department">—</span></p>
+          <p><strong>Owner:&nbsp;</strong> <span data-c="owner">—</span></p>
         </div>
       </div>
+      <div class="separator"></div>
+
       <p
         class="no-child-text"
         style="display: none; font-style: italic; color: #555"
@@ -95,28 +97,40 @@
         ZOHODESK.get("ticket")
           .then((res) => {
             const ticket = res.ticket;
-            const mappedParent = mapTicket(ticket);
-
-            let isParent = ticket.cf?.cf_is_parent_ticket;
-            let isChild = ticket.cf?.cf_has_parent_ticket;
-            const parentId = ticket.cf?.cf_parent_ticket_id_1;
+            const isParent = ticket.cf?.cf_is_parent_ticket;
+            const isChild = ticket.cf?.cf_has_parent_ticket;
             const parentCard = document.getElementById("parentCard");
-            parentCard.style.display = "none";
-            console.log("RAW? ", ticket);
-            console.log("isParent? " + isParent);
-            console.log("isChild? " + isChild);
-            if (parentId && isChild) {
-              //show the parent view
-              parentCard.style.display = "flex";
-              fetchParent(parentId);
+            const peerCard = document.getElementById(
+              "ticket-row child-template",
+            );
+            parentCard.classList.add("hidden");
+
+            if (isChild) {
+              // This ticket is a child → show its parent
+              const parentId = "519235000049291001";
+              if (parentId) {
+                parentCard.classList.remove("hidden");
+                fetchParent(parentId);
+                fetchChildren(parentId);
+              } else {
+                console.warn("Child ticket missing parent ID");
+                showNoChildText();
+              }
+            } else if (isParent) {
+              // This ticket is a parent → fetch its children
+              const parentId = ticket.id; // use the parent ticket's own ID
+              parentCard.classList.remove("hidden"); // optional, show parent info
+              //renderParent(mapTicket(ticket)); // render parent ticket immediately
+              fetchChildren(parentId); // fetch all children
             } else {
-              fetchChildren(parentId, ticket.id);
-              //showNoChildText();
+              // Neither parent nor child
+              console.log("Ticket is neither parent nor child");
+              showNoChildText();
             }
           })
           .catch((err) => {
-            console.log("Error fetching parent ticket:", err);
-            showNoChildText(); // optional: show message if parent fails
+            console.log("Error fetching current ticket:", err);
+            showNoChildText();
           });
       }
 
@@ -147,24 +161,28 @@
         });
       }
 
-      function fetchChildren(parentId) {
-        console.log("FETCHING CHILDREN...");
+      async function fetchChildren(parentId) {
+        console.log("FETCHING CHILDREN for parent:", parentId);
+        let allTickets = [];
+        if (!parentId) {
+          showNoChildText();
+          return;
+        }
 
-        ZOHODESK.request({
-          url: `https://desk.zoho.com/api/v1/tickets/search?criteria=`,
-          headers: { "Content-Type": "application/json" },
-          postBody: {},
-          type: "GET",
-          data: { orgId: "720446337", criteria:"" },
-          connectionLinkName: "desk_api",
-        })
+        ZOHODESK.get("ticket")
           .then((res) => {
-            const outer = typeof res === "string" ? JSON.parse(res) : res;
-            const inner = JSON.parse(outer.response);
+            const ticket = res.ticket;
+            console.log("CHILD FETCH", ticket);
 
-            const children = inner.data || [];
+            allTickets = allTickets.concat(ticket);
 
-            console.log("CHILDREN", res);
+            // Filter children manually
+            console.log("PARENT ID FROM CHILD: ", allTickets);
+
+            const children = allTickets.filter(
+              (t) => t.cf?.cf_parent_ticket_id_1 == parentId,
+            );
+            console.log("CHILDREN", children);
 
             if (!children.length) {
               showNoChildText();
@@ -174,8 +192,9 @@
             children.forEach((t) => renderChild(mapTicket(t)));
           })
           .catch((err) => {
-            console.error("CHILD FETCH ERROR", err);
+            console.error("CHILD FETCH ERROR on page", err);
             showNoChildText();
+            return;
           });
       }
 
@@ -272,25 +291,26 @@
 
         const clone = template.cloneNode(true);
         clone.classList.remove("child-template");
-        clone.style.display = "flex";
+        clone.classList.remove("hidden");
 
         clone.querySelector("[data-c='ticketNumber']").textContent =
           `#${t.ticketNumber}`;
         clone.querySelector("[data-c='name']").textContent =
           t.contact?.firstName || "—";
         clone.querySelector("[data-c='created']").textContent =
-          "Created On: " + formatDate(t.createdTime);
+          formatDate(t.createdTime);
         clone.querySelector("[data-c='due']").textContent =
-          "Due: " + formatDate(t.dueDate);
-        clone.querySelector("[data-c='department']").textContent =
-          "Department: " + (t.department?.name || "—");
+          formatDate(t.dueDate);
+      fetchDepartment(t.departmentId).then((dept) => {
+    clone.querySelector("[data-c='department']").textContent = dept.name || "—";
+  });
         clone.querySelector("[data-c='owner']").textContent =
-          "Owner: " + (t.assignee?.name || "—");
+          t.assignee?.name || "—";
 
         const statusEl = clone.querySelector(".status-color");
         statusEl.textContent = t.status || "—";
         statusEl.className = "status-badge";
-        statusEl.style.backgroundColor = getStatusColor(t.status);
+        statusEl.style.color = getStatusColor(t.status);
 
         container.appendChild(clone);
       }
