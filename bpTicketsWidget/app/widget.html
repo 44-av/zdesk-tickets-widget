@@ -143,11 +143,8 @@
           fetchContact(parent.contactId);
           fetchDepartment(parent.departmentId);
           fetchTicketOwner(parent.assigneeId);
-          console.log("Custom Fields:", parent.customFields);
-
           renderParent(mapTicket(parent));
         });
-        fetchChildren(parentId);
       }
 
       function fetchChildren(parentId) {
