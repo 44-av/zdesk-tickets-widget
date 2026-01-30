@@ -1,19 +1,17 @@
 <!doctype html>
 <html>
-
 <head>
   <meta charset="UTF-8" />
-  <title>Zoho Desk - Apps</title>
+  <title>Parent and Child Custom View</title>
   <link rel="stylesheet" href="/app/css/index.css" />
 </head>
-
 <body>
   <!---Parent Ticket-->
   <div class="ticket-card" id="parentCard">
     <h3 class="card-title">Parent Ticket</h3>
     <div class="separator"></div>
 
-    <!-- This row contains all the ticket info below the header -->
+    <!-- This row contains all the parent ticket info below the header -->
     <div class="ticket-row">
       <div class="col left">
         <p class="visit">Client Visit</p>
@@ -29,9 +27,7 @@
       </div>
 
       <div class="col middle">
-        <p class="meta" data-p="due">
-          Due:<span class="ticketData">-</span>
-        </p>
+        <p class="meta" data-p="due">Due:<span class="ticketData">-</span></p>
         <p class="status" data-p="status">
           Status: <span class="ticketData">-</span>
         </p>
@@ -53,308 +49,36 @@
     <h3 class="card-title">Peer Child Ticket</h3>
     <div class="separator"></div>
 
-    <!-- TEMPLATE (hidden, used for cloning) -->
+    <!-- This row contains all the peer ticket info below the header-->
     <div class="ticket-peer hidden">
-  <div class="ticket-row child-template" style="display:none">
-    <div class="col left">
-      <p class="visit">Client Visit</p>
-      <p class="id-name">
-        <span data-c="ticketNumber">#</span> - 
-        <span data-c="name">Name</span>
-      </p>
-      <p><strong>Created On:</strong> <span data-c="created"></span></p>
+      <div class="ticket-row child-template" style="display: none">
+        <div class="col left">
+          <p class="visit">Client Visit</p>
+          <p class="id-name">
+            <span data-c="ticketNumber">#</span> -
+            <span data-c="name">Name</span>
+          </p>
+          <p><strong>Created On:</strong> <span data-c="created"></span></p>
+        </div>
+        <div class="col middle">
+          <p><strong>Due:&nbsp;</strong> <span data-c="due">-</span></p>
+          <p class="status" data-p="status">
+            Status:&nbsp;<span class="status-color"></span>
+          </p>
+        </div>
+        <div class="col right">
+          <p>
+            <strong>Department:&nbsp;</strong><span data-c="department">—</span>
+          </p>
+          <p><strong>Owner:&nbsp;</strong> <span data-c="owner">—</span></p>
+        </div>
+      </div>
     </div>
-    <div class="col middle">
-      <p><strong>Due:&nbsp;</strong> <span data-c="due">-</span></p>
-      <p class="status" data-p="status">
-        Status:&nbsp;<span class="status-color"></span>
-      </p>
-    </div>
-    <div class="col right">
-      <p><strong>Department:&nbsp;</strong><span data-c="department">—</span></p>
-      <p><strong>Owner:&nbsp;</strong> <span data-c="owner">—</span></p>
-    </div>
-  </div>
-</div>
-
     <p class="no-child-text" style="display: none; font-style: italic; color: #555">
       No Child Ticket
     </p>
   </div>
-
   <script src="https://js.zohostatic.com/support/developer_sdk/v1/js/ZohoDeskClientSDK.min.js"></script>
-  <script>
-    window.onload = function () {
-      console.log("ON LOAD");
-
-      ZOHODESK.extension.onload().then(checkCurrentTicket);
-    };
-
-    function checkCurrentTicket() {
-      ZOHODESK.get("ticket")
-        .then((res) => {
-          const ticket = res.ticket;
-          const isParent = ticket.cf?.cf_is_parent_ticket === "true";
-          const isChild = ticket.cf?.cf_is_child_tickets === "true";
-          const parentCard = document.getElementById("parentCard");
-          const peerCard = document.querySelector(".ticket-peer");
-          parentCard.classList.add("hidden");
-
-          if (isChild) {
-            const parentId = ticket.cf.cf_parent_ticket_id;
-            parentCard.classList.remove("hidden");
-            fetchParent(parentId);
-            fetchChildren(parentId);
-          } else if (isParent) {
-            const parentId = ticket.id;
-            fetchChildren(parentId);
-          } else {
-            console.log("Ticket is neither parent nor child");
-            showNoChildText();
-          }
-        })
-        .catch((err) => {
-          console.log("Error fetching current ticket:", err);
-          showNoChildText();
-        });
-    }
-
-    function fetchParent(parentId) {
-      ZOHODESK.request({
-        url: `https://desk.zoho.com/api/v1/tickets/${parentId}`,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        postBody: {},
-        type: "GET",
-        data: { orgId: "846402869" },
-        connectionLinkName: "desk_api_conn",
-      }).then((res) => {
-        const outer = typeof res === "string" ? JSON.parse(res) : res;
-        const inner = JSON.parse(outer.response); // <-- real API body
-
-        const parent = inner.statusMessage; // <-- actual ticket object
-        fetchContact(parent.contactId);
-        fetchDepartment(parent.departmentId);
-        fetchTicketOwner(parent.assigneeId);
-        renderParent(mapTicket(parent));
-      });
-    }
-
-    function fetchChildren(parentId) {
-      ZOHODESK.request({
-        url: `https://desk.zoho.com/api/v1/tickets/search?from=0&limit=50&customField1=cf_parent_ticket_id:${parentId}`,
-        type: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "orgId": "846402869",
-        },
-        postBody: {},
-        connectionLinkName: "desk_api_conn",
-      })
-        .then((res) => {
-          const outer = typeof res === "string" ? JSON.parse(res) : res;
-          const body = JSON.parse(outer.response);
-          const children = body.statusMessage;
-          const peers = children.data || [];
-
-          if (!peers.length) {
-            showNoChildText();
-            return;
-          }
-
-          peers.forEach((t) => renderChild(mapTicket(t)));
-        })
-        .catch((err) => {
-          console.error("Child fetch failed", err);
-          showNoChildText();
-        });
-    }
-
-    //FETCH OTHER DATA FOR EACH TICKET
-    function fetchContact(id) {
-      return ZOHODESK.request({
-        url: `https://desk.zoho.com/api/v1/contacts/${id}`,
-        headers: { "Content-Type": "application/json" },
-        postBody: {},
-        type: "GET",
-        data: { orgId: "846402869" },
-        connectionLinkName: "desk_api_conn",
-      }).then((r) => {
-        const outer = typeof r === "string" ? JSON.parse(r) : r;
-        const res = JSON.parse(outer.response);
-        // extract the actual contact
-        const contact = res.statusMessage || {};
-        const firstName = contact.firstName || "";
-        const lastName = contact.lastName || "";
-        const fullName = (firstName + " " + lastName).trim() || "—";
-        // update UI directly
-        setText("[data-p='name']", fullName);
-
-        // return the contact object in case you need it later
-        return contact;
-      });
-    }
-
-    function fetchDepartment(id) {
-      return ZOHODESK.request({
-        url: `https://desk.zoho.com/api/v1/departments/${id}`,
-        headers: { "Content-Type": "application/json" },
-        postBody: {},
-        type: "GET",
-        data: { orgId: "846402869" },
-        connectionLinkName: "desk_api_conn",
-      }).then((r) => {
-        const outer = typeof r === "string" ? JSON.parse(r) : r;
-        const res = JSON.parse(outer.response);
-        const dept = res.statusMessage || {};
-        const deptName = dept.name || "—";
-        setText("[data-p='department'] .ticketData", deptName);
-        return dept;
-      });
-    }
-
-    function fetchTicketOwner(id) {
-      return ZOHODESK.request({
-        url: `https://desk.zoho.com/api/v1/agents/${id}`,
-        headers: { "Content-Type": "application/json" },
-        postBody: {},
-        type: "GET",
-        data: { orgId: "846402869" },
-        connectionLinkName: "desk_api_conn",
-      }).then((r) => {
-        const outer = typeof r === "string" ? JSON.parse(r) : r;
-        const res = JSON.parse(outer.response);
-        const owner = res.statusMessage || {};
-        const firstName = owner.firstName || "";
-        const lastName = owner.lastName || "";
-        const fullName = (firstName + " " + lastName).trim() || "—";
-        setText("[data-p='owner'] .ticketData", fullName);
-
-        return owner;
-      });
-    }
-
-    // --- Render functions ---
-    function renderParent(t) {
-      if (!t.ticketNumber && (!t.contact.name || t.contact.name === "—")) {
-        document.getElementById("parentCard").classList.add("hidden");
-        return;
-      }
-      setText("[data-p='ticketNumber']", `#${t.ticketNumber}`);
-      setText("[data-p='created'] .ticketData", formatDate(t.createdTime));
-      setText("[data-p='due'] .ticketData", formatDate(t.dueDate));
-      setText("[data-p='owner'] .ticketData", t.assignee.name); // <- use mapped name
-      const statusSpan = document.querySelector("[data-p='status'] .ticketData");
-      statusSpan.textContent = t.status || "—";
-      statusSpan.className = "status-badge";
-      statusSpan.style.color = getStatusColor(t.status);
-    }
-
-
-    function renderChild(t) {
-      if (!t.ticketNumber && (!t.contact.name || t.contact.name === "—") && !t.status) {
-        return; // skip rendering empty ticket
-      }
-      const container = document.getElementById("peerChildContainer");
-      const wrapper = container.querySelector(".ticket-peer");
-
-      const template = container.querySelector(".child-template");
-      const clone = template.cloneNode(true);
-
-      clone.classList.remove("child-template", "hidden");
-      wrapper.classList.remove("hidden");
-
-      clone.style.display = ""; // show cloned row
-      clone.classList.remove("child-template");
-
-      clone.querySelector("[data-c='ticketNumber']").textContent = `#${t.ticketNumber}`;
-      clone.querySelector("[data-c='name']").textContent = t.contact.name;
-      clone.querySelector("[data-c='created']").textContent = formatDate(t.createdTime);
-      clone.querySelector("[data-c='due']").textContent = formatDate(t.dueDate);
-      clone.querySelector("[data-c='owner']").textContent = t.assignee.name; // <- mapped name
-
-      fetchDepartment(t.departmentId).then((dept) => {
-        clone.querySelector("[data-c='department']").textContent = dept.name || "—";
-      });
-
-      const statusEl = clone.querySelector(".status-color");
-      statusEl.textContent = t.status;
-      statusEl.style.color = getStatusColor(t.status);
-
-      container.appendChild(clone);
-
-      const sep = document.createElement("div");
-      sep.className = "separator";
-      container.appendChild(sep);
-    }
-
-
-    // --- Helpers ---
-    function mapTicket(ticket) {
-      return {
-        id: ticket.id,
-        ticketNumber: ticket.number || ticket.ticketNumber,
-        subject: ticket.subject,
-        createdTime: ticket.createdTime,
-        dueDate: ticket.dueDate,
-        status: ticket.status || ticket.statusType,
-        departmentId: ticket.departmentId,
-        contactId: ticket.contact?.id || null,
-        contact: {
-          firstName: ticket.contact?.firstName || "—",
-          lastName: ticket.contact?.lastName || "",
-          get name() {
-            return ((this.firstName || "") + " " + (this.lastName || "")).trim() || "—";
-          }
-        },
-        assigneeId: ticket.assignee?.id || null,
-        assignee: {
-          firstName: ticket.assignee?.firstName || "",
-          lastName: ticket.assignee?.lastName || "",
-          get name() {
-            return ((this.firstName || "") + " " + (this.lastName || "")).trim() || "—";
-          }
-        },
-      };
-    }
-
-    function showNoChildText() {
-      const container = document.getElementById("peerChildContainer");
-      const emptyText = container.querySelector(".no-child-text");
-      if (emptyText) emptyText.style.display = "block";
-    }
-
-    function setText(selector, text) {
-      const el = document.querySelector(selector);
-      if (el) el.textContent = text;
-    }
-
-    function getStatusColor(status) {
-      const colors = {
-        Closed: "#e74c3c",
-        "In Progress": "#3498db",
-        Open: "#2ecc71",
-        "On Hold": "#e67e22",
-        Escalated: "#f1c40f",
-      };
-      return colors[status] || "#7f8c8d";
-    }
-
-    function formatDate(dateInput) {
-      if (!dateInput) return "—";
-      return new Date(dateInput)
-        .toLocaleString("en-GB", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true,
-        })
-        .replace(",", "");
-    }
-  </script>
+  <script src="./api_calls.js"></script>
 </body>
-
 </html>
