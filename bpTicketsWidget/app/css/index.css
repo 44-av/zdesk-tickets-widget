@@ -6,6 +6,7 @@
   margin-bottom: 16px;
   font-family: Arial, sans-serif;
 }
+
 .card-title {
   font-size: 14px;
   font-weight: 600;
@@ -71,14 +72,31 @@
   background: #e6e6e6;
   margin: 8px 0;
 }
-.ticketData{
+.ticketData {
   font-weight: normal;
 }
+
 .status-badge {
-    display: inline-block;
-    color: white; /* text color */
+  display: inline-block;
+  color: white;
+    /* text color */
     font-weight: bold;
-    font-size: 0.9em;
+  font-size: 12px;
     text-align: center;
   }
 
+.neither-ticket-text {
+  padding: 14px;
+  margin-top: 10px;
+  text-align: center;
+  font-style: italic;
+  color: #555;
+  border: 1px dashed #ccc;
+  background: #f7f7f7;
+}
+
+.overdue-text {
+  color: red;
+  font-weight: 600;
+  margin-left: 6px;
+}
