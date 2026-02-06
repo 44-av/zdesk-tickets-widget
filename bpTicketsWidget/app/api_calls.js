@@ -61,7 +61,7 @@ function fetchParent(parentId) {
 // FETCH CHILD TICKETS LIST
 function fetchChildren(parentId) {
   ZOHODESK.request({
-    url: `https://desk.zoho.com/api/v1/tickets/search?from=0&limit=50&customField1=cf_parent_ticket_id:${parentId}`,
+    url: `https://desk.zoho.com/api/v1/tickets/search?from=0&limit=100&customField1=cf_parent_ticket_id:${parentId}`,
     type: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -164,11 +164,17 @@ function renderParent(t) {
     document.getElementById("parentCard").classList.add("hidden");
     return;
   }
+  const parentCard = document.getElementById("parentCard");
+
+  // Make card clickable
+  parentCard.classList.add("clickable");
+  parentCard.onclick = () => openTicketInDesk(t.id);
+
   // Populate data
   setText("[data-p='ticketNumber']", `#${t.ticketNumber}`);
   setText("[data-p='created'] .ticketData", formatDate(t.createdTime));
 
-   const parentDueEl = document.querySelector("[data-p='due'] .ticketData");
+  const parentDueEl = document.querySelector("[data-p='due'] .ticketData");
   parentDueEl.textContent = formatDate(t.dueDate);
   applyDueStatusToElement(t.dueDate, parentDueEl);
 
@@ -205,7 +211,8 @@ function renderChild(t) {
 
   clone.style.display = ""; // show cloned row
   clone.classList.remove("child-template");
-
+  clone.classList.add("clickable");
+  clone.onclick = () => openTicketInDesk(t.id);
   // Populate data
   clone.querySelector("[data-c='ticketNumber']").textContent =
     `#${t.ticketNumber}`;
@@ -364,5 +371,15 @@ function applyDueStatusToElement(dueDate, el) {
 function isOverdue(dueDate) {
   if (!dueDate) return false;
   return new Date(dueDate) < new Date();
+}
+
+
+// TO ALLOW OPENING TICKET IN ZOHO DESK WHEN CLICKED
+function openTicketInDesk(ticketId) {
+  ZOHODESK.invoke("ROUTE_TO", {
+    entity: "ticket",
+    id: ticketId,
+    target : "_blank"
+  });
 }
 

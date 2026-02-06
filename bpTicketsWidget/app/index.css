@@ -100,3 +100,16 @@
   font-weight: 600;
   margin-left: 6px;
 }
+
+.clickable {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.clickable:hover {
+  background-color: #f5f7fa; /* subtle Zoho-like hover */
+}
+
+.clickable:active {
+  background-color: #eef1f5;
+}
