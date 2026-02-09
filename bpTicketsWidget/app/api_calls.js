@@ -16,14 +16,17 @@ function checkCurrentTicket() {
       const parentCard = document.getElementById("parentCard");
       parentCard.classList.add("hidden");
 
+      const h3 = document.querySelector("[data-p='card-title-peer']");
+      if (!h3) return console.warn("Title <h3> not found");
+
       if (isChild) {
         const parentId = ticket.cf.cf_parent_ticket_id;
         parentCard.classList.remove("hidden");
-        setText("[data-p='card-title-peer']", "Peer Child Ticket");
+        h3.textContent = "Peer Child Ticket";
         fetchParent(parentId);
         fetchChildren(parentId);
       } else if (isParent) {
-        setText("[data-p='card-title-peer']", "Child Ticket");
+        h3.textContent = "Child Ticket";
         const parentId = ticket.id;
         fetchChildren(parentId);
       } else {
