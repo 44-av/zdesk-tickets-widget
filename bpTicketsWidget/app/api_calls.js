@@ -19,9 +19,11 @@ function checkCurrentTicket() {
       if (isChild) {
         const parentId = ticket.cf.cf_parent_ticket_id;
         parentCard.classList.remove("hidden");
+        setText("[data-p='card-title-peer']", "Peer Child Ticket");
         fetchParent(parentId);
         fetchChildren(parentId);
       } else if (isParent) {
+        setText("[data-p='card-title-peer']", "Child Ticket");
         const parentId = ticket.id;
         fetchChildren(parentId);
       } else {
