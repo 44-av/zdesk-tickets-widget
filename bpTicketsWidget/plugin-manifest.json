@@ -59,6 +59,19 @@
 	]
 }
   ],
-  "config": [],
+  "config": [
+  {
+    "name": "org_id",
+    "label": "Organization ID",
+    "type": "text",
+    "defaultValue": "846402869"
+  },
+  {
+    "name": "connection_name",
+    "label": "Connection Name",
+    "type": "text",
+    "defaultValue": "desk_api_conn"
+  }
+],
   "moduleSupport": true
 }
