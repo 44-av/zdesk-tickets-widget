@@ -1,7 +1,6 @@
 //read the value from .env file
 const org_id = "846402869";
 const connection_name = "desk_api_conn";
-let current_ticket_id = null;
 // --- Onload: Initialize extension and check current ticket ---
 window.onload = function () {
   ZOHODESK.extension.onload().then(checkCurrentTicket);
@@ -12,7 +11,7 @@ function checkCurrentTicket() {
   ZOHODESK.get("ticket")
     .then((res) => {
       const ticket = res.ticket;
-      current_ticket_id = ticket.id;
+      const current_ticket_id = ticket.id;
       const isParent = ticket.cf?.cf_is_parent_ticket === "true";
       const isChild = ticket.cf?.cf_is_child_tickets === "true";
       const parentCard = document.getElementById("parentCard");
@@ -23,11 +22,10 @@ function checkCurrentTicket() {
         parentCard.classList.remove("hidden");
         setText("[data-c='card-title-peer']", "Peer Child Ticket");
         fetchParent(parentId);
-        fetchChildren(parentId);
+        fetchChildren(parentId, current_ticket_id);
       } else if (isParent) {
-        h3.textContent = "Child Ticket";
         const parentId = ticket.id;
-        fetchChildren(parentId);
+        fetchChildren(parentId, current_ticket_id);
         setText("[data-c='card-title-peer']", "Child Ticket");
 
       } else {
@@ -65,7 +63,7 @@ function fetchParent(parentId) {
 }
 
 // FETCH CHILD TICKETS LIST
-function fetchChildren(parentId) {
+function fetchChildren(parentId, current_ticket_id) {
   ZOHODESK.request({
     url: `https://desk.zoho.com/api/v1/tickets/search?from=0&limit=100&customField1=cf_parent_ticket_id:${parentId}`,
     type: "GET",
@@ -81,6 +79,8 @@ function fetchChildren(parentId) {
       const body = JSON.parse(outer.response);
       const children = body.statusMessage;
 
+      console.log("before filter");
+      
       const peers = (children.data || []).filter(
         (t) => String(t.id) !== String(current_ticket_id)
       );
