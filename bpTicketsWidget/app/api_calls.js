@@ -56,7 +56,9 @@ function fetchParent(parentId) {
     const inner = JSON.parse(outer.response);
     const parent = inner.statusMessage;
     fetchContact(parent.contactId);
-    fetchDepartment(parent.departmentId);
+    //fetchDepartment(parent.departmentId);
+    fetchDepartment(parent.departmentId)
+  .then(name => setText("[data-p='department'] .ticketData", name));
     fetchTicketOwner(parent.assigneeId);
     renderParent(mapTicket(parent));
   });
@@ -141,8 +143,8 @@ function fetchDepartment(id) {
     const res = JSON.parse(outer.response);
     const dept = res.statusMessage || {};
     const deptName = dept.name || "—";
-    setText("[data-p='department'] .ticketData", deptName);
-    return dept;
+    //setText("[data-p='department'] .ticketData", deptName);
+    return deptName;
   });
 }
 
