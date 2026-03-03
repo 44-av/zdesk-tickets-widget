@@ -193,8 +193,8 @@ function renderParent(t) {
 
   setText("[data-p='owner'] .ticketData", t.assignee.name); // <- use mapped name
   const statusSpan = document.querySelector("[data-p='status'] .ticketData");
-statusSpan.textContent = t.status || "—";
-statusSpan.className = "status-badge";
+  statusSpan.textContent = t.status || "—";
+  statusSpan.className = "status-badge";
 
 if (t.status === "Open" && isOverdue(t.dueDate)) {
   statusSpan.style.color = "red"; // red
@@ -239,12 +239,13 @@ function renderChild(t) {
 
   clone.querySelector("[data-c='owner']").textContent = t.assignee.name;
 
-  fetchDepartment(t.departmentId).then((dept) => {
-    clone.querySelector("[data-c='department']").textContent = dept.name || "—";
+  fetchDepartment(t.departmentId)
+  .then(deptName => {
+    clone.querySelector("[data-c='department']").textContent = deptName;
   });
 
   const statusEl = clone.querySelector(".status-color");
-statusEl.textContent = t.status;
+  statusEl.textContent = t.status;
 
 if (t.status === "Open" && isOverdue(t.dueDate)) {
   statusEl.style.color = "red"; // red

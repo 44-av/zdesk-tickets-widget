@@ -22,3 +22,9 @@ Error: (node:7464) [DEP0190] DeprecationWarning: Passing args to a child process
 (Use `node --trace-deprecation ...` to show where the warning was created)
     at C:\Users\Ariane\AppData\Roaming\npm\node_modules\zoho-extension-toolkit\lib\utils\runHookCommand.js:47:17
     at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+[error] [2026-03-03T00:39:39.078Z] : uncaughtException: (node:25244) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Error: (node:25244) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+    at C:\Users\Ariane\AppData\Roaming\npm\node_modules\zoho-extension-toolkit\lib\utils\runHookCommand.js:47:17
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
