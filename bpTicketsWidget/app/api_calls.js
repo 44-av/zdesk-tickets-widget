@@ -56,9 +56,7 @@ function fetchParent(parentId) {
     const inner = JSON.parse(outer.response);
     const parent = inner.statusMessage;
     fetchContact(parent.contactId);
-    //fetchDepartment(parent.departmentId);
-    fetchDepartment(parent.departmentId)
-  .then(name => setText("[data-p='department'] .ticketData", name));
+    fetchDepartment(parent.departmentId).then(name => setText("[data-p='department'] .ticketData", name));
     fetchTicketOwner(parent.assigneeId);
     renderParent(mapTicket(parent));
   });
@@ -66,6 +64,9 @@ function fetchParent(parentId) {
 
 // FETCH CHILD TICKETS LIST
 function fetchChildren(parentId, current_ticket_id) {
+  const container = document.getElementById("peerChildContainer");
+  if (container) container.classList.remove("hidden");
+  
   ZOHODESK.request({
     url: `https://desk.zoho.com/api/v1/tickets/search?from=0&limit=100&customField1=cf_parent_ticket_id:${parentId}`,
     type: "GET",
@@ -92,7 +93,7 @@ function fetchChildren(parentId, current_ticket_id) {
      console.log("Filtered Children:", peers);
 
       if (!peers.length) {
-        showNoChildText();
+        hideChildContainer();
         return;
       }
 
@@ -100,7 +101,7 @@ function fetchChildren(parentId, current_ticket_id) {
     })
     .catch((err) => {
       console.error("Child fetch failed", err);
-      showNoChildText();
+      hideChildContainer();
     });
 }
 
@@ -124,7 +125,6 @@ function fetchContact(id) {
     const fullName = (firstName + " " + lastName).trim() || "—";
     // update UI directly
     setText("[data-p='name']", fullName);
-    // return the contact object in case you need it later
     return contact;
   });
 }
@@ -143,7 +143,6 @@ function fetchDepartment(id) {
     const res = JSON.parse(outer.response);
     const dept = res.statusMessage || {};
     const deptName = dept.name || "—";
-    //setText("[data-p='department'] .ticketData", deptName);
     return deptName;
   });
 }
@@ -178,20 +177,18 @@ function renderParent(t) {
     return;
   }
   const parentCard = document.getElementById("parentCard");
+  const parentDueEl = document.querySelector("[data-p='due'] .ticketData");
+  parentDueEl.textContent = formatDate(t.dueDate);
 
-  // Make card clickable
   parentCard.classList.add("clickable");
   parentCard.onclick = () => openTicketInDesk(t.id);
 
-  // Populate data
   setText("[data-p='ticketNumber']", `#${t.ticketNumber}`);
   setText("[data-p='created'] .ticketData", formatDate(t.createdTime));
+  setText("[data-p='owner'] .ticketData", t.assignee.name); 
 
-  const parentDueEl = document.querySelector("[data-p='due'] .ticketData");
-  parentDueEl.textContent = formatDate(t.dueDate);
   applyDueStatusToElement(t.dueDate, parentDueEl);
 
-  setText("[data-p='owner'] .ticketData", t.assignee.name); // <- use mapped name
   const statusSpan = document.querySelector("[data-p='status'] .ticketData");
   statusSpan.textContent = t.status || "—";
   statusSpan.className = "status-badge";
@@ -294,11 +291,12 @@ function mapTicket(ticket) {
   };
 }
 
-// SHOW NO CHILD TICKETS TEXT
-function showNoChildText() {
+// HIDE PEER CONTAINER IF NO PEER TICKETS
+function hideChildContainer() {
   const container = document.getElementById("peerChildContainer");
-  const emptyText = container.querySelector(".no-child-text");
-  if (emptyText) emptyText.style.display = "block";
+  if (container) {
+    container.classList.add("hidden");
+  }
 }
 
 // SHOW NEITHER PARENT NOR CHILD MESSAGE
