@@ -14,15 +14,17 @@
     <!-- This row contains all the parent ticket info below the header -->
     <div class="ticket-row">
       <div class="col left">
-        <p class="visit">Client Visit</p>
-
+<p>
+          <strong>Category:&nbsp;</strong>
+          <span class="ticketData" data-c="category">—</span>
+        </p>
+        <p>
+          <strong>Subcategory:&nbsp;</strong>
+          <span class="ticketData" data-c="subcategory">—</span>
+        </p>
         <p class="id-name">
           <span data-p="ticketNumber">#</span> -
           <span data-p="name">Name</span>
-        </p>
-
-        <p class="meta" data-p="created">
-          Created On: <span class="ticketData">-</span>
         </p>
       </div>
 
@@ -30,6 +32,9 @@
         <p class="meta" data-p="due">Due:<span class="ticketData">-</span></p>
         <p class="status" data-p="status">
           Status: <span class="ticketData">-</span>
+        </p>
+         <p class="meta" data-p="created">
+          Created On: <span class="ticketData">-</span>
         </p>
       </div>
 
@@ -53,18 +58,25 @@
     <div class="ticket-peer hidden">
       <div class="ticket-row child-template" style="display: none">
         <div class="col left">
-          <p class="visit">Client Visit</p>
-          <p class="id-name">
+         <p>
+          <strong>Category:&nbsp;</strong>
+          <span class="ticketData" data-c="category">—</span>
+        </p>
+        <p>
+          <strong>Subcategory:&nbsp;</strong>
+          <span class="ticketData" data-c="subcategory">—</span>
+        </p>
+        <p class="id-name">
             <span data-c="ticketNumber">#</span> -
             <span data-c="name">Name</span>
           </p>
-          <p><strong>Created On:</strong> <span data-c="created"></span></p>
         </div>
         <div class="col middle">
           <p><strong>Due:&nbsp;</strong> <span data-c="due">-</span></p>
           <p class="status" data-p="status">
             Status:&nbsp;<span class="status-color"></span>
           </p>
+          <p><strong>Created On:</strong> <span data-c="created"></span></p>
         </div>
         <div class="col right">
           <p>

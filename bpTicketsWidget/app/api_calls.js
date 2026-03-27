@@ -16,7 +16,7 @@ function checkCurrentTicket() {
       const isChild = ticket.cf?.cf_is_child_tickets === "true";
       const parentCard = document.getElementById("parentCard");
       parentCard.classList.add("hidden");
-
+console.log("Ticket raw:", ticket);
       if (isChild) {
         const parentId = ticket.cf.cf_parent_ticket_id;
         parentCard.classList.remove("hidden");
@@ -186,7 +186,8 @@ function renderParent(t) {
   setText("[data-p='ticketNumber']", `#${t.ticketNumber}`);
   setText("[data-p='created'] .ticketData", formatDate(t.createdTime));
   setText("[data-p='owner'] .ticketData", t.assignee.name); 
-
+  setText("[data-p='category']", t.category);
+  setText("[data-p='subcategory']", t.subCategory);
   applyDueStatusToElement(t.dueDate, parentDueEl);
 
   const statusSpan = document.querySelector("[data-p='status'] .ticketData");
@@ -235,6 +236,8 @@ function renderChild(t) {
   applyDueStatusToElement(t.dueDate, dueEl);
 
   clone.querySelector("[data-c='owner']").textContent = t.assignee.name;
+  clone.querySelector("[data-c='category']").textContent = t.category;
+  clone.querySelector("[data-c='subcategory']").textContent = t.subCategory;
 
   fetchDepartment(t.departmentId)
   .then(deptName => {
@@ -268,6 +271,8 @@ function mapTicket(ticket) {
     dueDate: ticket.dueDate,
     status: ticket.status || ticket.statusType,
     departmentId: ticket.departmentId,
+    category: ticket.category || "—",
+    subCategory: ticket.subCategory || ticket.subcategory || "—",
     contactId: ticket.contact?.id || null,
     contact: {
       firstName: ticket.contact?.firstName || "—",
