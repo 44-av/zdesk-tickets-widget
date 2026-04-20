@@ -1,6 +1,6 @@
 //read the value from .env file
-const org_id = "846402869";
-const connection_name = "desk_api_conn";
+const org_id = "655766725";
+const connection_name = "zdesk_conn";
 // --- Onload: Initialize extension and check current ticket ---
 window.onload = function () {
   ZOHODESK.extension.onload().then(checkCurrentTicket);
@@ -13,7 +13,7 @@ function checkCurrentTicket() {
       const ticket = res.ticket;
       const current_ticket_id = ticket.id;
       const isParent = ticket.cf?.cf_is_parent_ticket === "true";
-      const isChild = ticket.cf?.cf_is_child_tickets === "true";
+      const isChild = ticket.cf?.cf_is_child_ticket === "true";
       const parentCard = document.getElementById("parentCard");
       parentCard.classList.add("hidden");
 console.log("Ticket raw:", ticket);
@@ -81,7 +81,11 @@ function fetchChildren(parentId, current_ticket_id) {
       const outer = typeof res === "string" ? JSON.parse(res) : res;
       const body = JSON.parse(outer.response);
       const children = body.statusMessage;
+      const children_body = body;
 
+      console.log("fetches body:", children_body);
+
+      
       console.log("before filter");
       
       const peers = (children.data || []).filter(

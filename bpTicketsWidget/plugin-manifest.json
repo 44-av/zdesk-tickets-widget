@@ -32,12 +32,12 @@
   "zohoAuthorisation": {},
   "connectors": [
     {
-	"connectionLinkName": "desk_api_conn",
-	"connectionName": "desk_api_conn",
+	"connectionLinkName": "zdesk_conn",
+	"connectionName": "zdesk_conn",
 	"serviceName": "zoho_desk",
-	"userAccess": true,
+	"userAccess": false,
 	"isUserDefinedService": false,
-	"sharedBy": "846402869",
+	"sharedBy": "655766725",
 	"scope": [
 		"Desk.integrations.READ",
 		"Desk.contacts.READ",
@@ -45,17 +45,24 @@
 		"Desk.tickets.READ",
 		"Desk.contacts.CREATE",
 		"Desk.basic.ALL",
-		"Desk.settings.READ",
 		"Desk.tickets.UPDATE",
-		"Desk.articles.READ",
 		"Desk.custommodule.READ",
+		"Desk.custommodule.DELETE",
 		"Desk.extensions.READ",
 		"Desk.tickets.CREATE",
 		"Desk.tasks.READ",
 		"Desk.search.READ",
 		"Desk.contacts.UPDATE",
+		"Desk.tickets.DELETE",
 		"Desk.custommodule.CREATE",
-		"Desk.custommodule.UPDATE"
+		"Desk.custommodule.UPDATE",
+		"Desk.extensions.UPDATE",
+		"Desk.tickets.ALL",
+		"Desk.contacts.ALL",
+		"Desk.extensions.ALL",
+		"Desk.integrations.ALL",
+		"Desk.custommodule.ALL",
+		"Desk.modules.ALL"
 	]
 }
   ],
@@ -64,13 +71,13 @@
     "name": "org_id",
     "label": "Organization ID",
     "type": "text",
-    "defaultValue": "846402869"
+    "defaultValue": "655766725"
   },
   {
     "name": "connection_name",
     "label": "Connection Name",
     "type": "text",
-    "defaultValue": "desk_api_conn"
+    "defaultValue": "zdesk_conn"
   }
 ],
   "moduleSupport": true
