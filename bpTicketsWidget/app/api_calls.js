@@ -1,6 +1,6 @@
 //read the value from .env file
 const org_id = "846402869";
-const connection_name = "desk_api_conn";
+const connection_name = "oauth_conn";
 // --- Onload: Initialize extension and check current ticket ---
 window.onload = function () {
   ZOHODESK.extension.onload().then(checkCurrentTicket);
@@ -123,8 +123,11 @@ function fetchContact(id) {
     const firstName = contact.firstName || "";
     const lastName = contact.lastName || "";
     const fullName = (firstName + " " + lastName).trim() || "—";
+     const email = contact.email || "—";
+
     // update UI directly
     setText("[data-p='name']", fullName);
+    setText("[data-p='email'] .ticketData", email);
     return contact;
   });
 }
@@ -234,7 +237,7 @@ function renderChild(t) {
   const dueEl = clone.querySelector("[data-c='due']");
   dueEl.textContent = formatDate(t.dueDate);
   applyDueStatusToElement(t.dueDate, dueEl);
-
+  clone.querySelector("[data-c='email']").textContent = t.contact.email || "—";
   clone.querySelector("[data-c='owner']").textContent = t.assignee.name;
   clone.querySelector("[data-c='category']").textContent = t.category;
   clone.querySelector("[data-c='subcategory']").textContent = t.subCategory;
@@ -277,6 +280,7 @@ function mapTicket(ticket) {
     contact: {
       firstName: ticket.contact?.firstName || "—",
       lastName: ticket.contact?.lastName || "",
+      email: ticket.contact?.email || "—",
       get name() {
         return (
           ((this.firstName || "") + " " + (this.lastName || "")).trim() || "—"
