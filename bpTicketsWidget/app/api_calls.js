@@ -1,6 +1,6 @@
 //read the value from .env file
 const org_id = "846402869";
-const connection_name = "oauth_conn";
+const connection_name = "desk_api_conn";
 // --- Onload: Initialize extension and check current ticket ---
 window.onload = function () {
   ZOHODESK.extension.onload().then(checkCurrentTicket);
